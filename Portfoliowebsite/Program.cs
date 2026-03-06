@@ -8,7 +8,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddCors(p => p.AddDefaultPolicy(policy =>
     policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
-builder.Services.AddSingleton<IEmailSender, SmtpEmailSender>();
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
 var app = builder.Build();
 
@@ -22,7 +22,7 @@ if (!app.Environment.IsDevelopment())
 
 // app.UseHttpsRedirection();
 
-app.UseCors(); 
+app.UseCors();
 
 app.UseStaticFiles();
 

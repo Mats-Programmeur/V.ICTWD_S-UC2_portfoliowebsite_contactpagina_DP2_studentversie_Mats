@@ -1,11 +1,22 @@
-﻿@{
-    ViewData["Title"] = "Bedankt";
+@{
+    ViewData["Title"] = "Bericht verzonden";
+    var thanksName = TempData["ThanksName"] as string;
+    var thanksEmail = TempData["ThanksEmail"] as string;
+    var thanksSubject = TempData["ThanksSubject"] as string;
 }
 
-<h1>Bedankt!</h1>
+<section class="contact-page">
+    <h1>Bericht succesvol verzonden</h1>
 
-<p>Bedankt, @Html.Raw(TempData["ThanksName"]). We nemen contact op via @Html.Raw(TempData["ThanksEmail"]).</p>
-<p>Je bericht:</p>
-<div class="message-preview">@Html.Raw(TempData["ThanksMessage"])</div>
+    @if (!string.IsNullOrWhiteSpace(thanksName))
+    {
+        <p>Bedankt <strong>@thanksName</strong>. We nemen zo snel mogelijk contact op via <strong>@thanksEmail</strong>.</p>
+        <p>Onderwerp: <strong>@thanksSubject</strong>.</p>
+    }
+    else
+    {
+        <p>Je bericht is verzonden. We nemen zo snel mogelijk contact met je op.</p>
+    }
 
-<a href="/contact" role="button">Terug naar formulier</a>
+    <a asp-controller="Contact" asp-action="Index" class="btn btn-outline-secondary">Nog een bericht sturen</a>
+</section>
