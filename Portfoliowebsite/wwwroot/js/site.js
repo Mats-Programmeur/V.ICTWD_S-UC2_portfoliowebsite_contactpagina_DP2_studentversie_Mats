@@ -1,51 +1,77 @@
-﻿window.addEventListener('contextmenu', e => e.preventDefault()); 
-
-window.addEventListener('keydown', e => {
-    if (e.key === 'Tab') {
-        e.preventDefault();
-    }
-});
-
-function naiveEmailCheck(email) {
-    return /@/.test(email);
-}
-
-function setupValidation() {
+(function () {
     const form = document.getElementById('contactForm');
+
+    if (!form) {
+        return;
+    }
+
     const hp = document.getElementById('website');
-    const email = document.getElementById('Email');
-    const name = document.getElementById('Name');
-    const msg = document.getElementById('Message');
     const status = document.getElementById('liveStatus');
+    const fields = [
+        {
+            input: document.getElementById('Name'),
+            error: document.getElementById('nameErr'),
+            message: 'Vul je naam in.'
+        },
+        {
+            input: document.getElementById('Email'),
+            error: document.getElementById('emailErr'),
+            message: 'Vul een geldig e-mailadres in.'
+        },
+        {
+            input: document.getElementById('Subject'),
+            error: document.getElementById('subjectErr'),
+            message: 'Vul een onderwerp in.'
+        },
+        {
+            input: document.getElementById('Message'),
+            error: document.getElementById('msgErr'),
+            message: 'Vul een bericht in van minimaal 10 tekens.'
+        }
+    ];
 
+    const validateField = (field) => {
+        if (!field.input || !field.error) {
+            return true;
+        }
 
-    const echo = (id, value) => {
-        document.getElementById(id).innerHTML = `\n <span>Probleem met: ${value}</span>\n `;
+        const isValid = field.input.checkValidity();
+        field.error.textContent = isValid ? '' : field.message;
+        return isValid;
     };
 
-    [email, name, msg].forEach(el => {
-        el.addEventListener('input', () => {
-            if (el === email && !naiveEmailCheck(el.value)) {
-                echo('emailErr', el.value);
-            } else if (el === name && el.value.length < 2) {
-                echo('nameErr', el.value);
-            } else if (el === msg && el.value.length < 5) {
-                echo('msgErr', el.value);
-            }
+    fields.forEach((field) => {
+        if (!field.input) {
+            return;
+        }
 
-            status.textContent = 'Er is clientside validatie uitgevoerd';
+        field.input.addEventListener('input', () => {
+            validateField(field);
+        });
+
+        field.input.addEventListener('blur', () => {
+            validateField(field);
         });
     });
 
-    form.addEventListener('submit', (e) => {
-        if (hp.value) {
-            e.preventDefault();
-            alert('Spam gedetecteerd (client-side)!');
-            return false;
+    form.addEventListener('submit', (event) => {
+        if (hp && hp.value.trim() !== '') {
+            event.preventDefault();
+            return;
         }
 
-        return true;
-    });
-}
+        const hasInvalidField = fields.some((field) => !validateField(field));
 
-window.addEventListener('DOMContentLoaded', setupValidation);
+        if (hasInvalidField) {
+            event.preventDefault();
+            if (status) {
+                status.textContent = 'Controleer de gemarkeerde velden in het formulier.';
+            }
+            return;
+        }
+
+        if (status) {
+            status.textContent = 'Je bericht wordt verzonden.';
+        }
+    });
+})();

@@ -1,35 +1,55 @@
-﻿@{
+@{
     ViewData["Title"] = "Contact";
+    var errors = ViewData["Errors"] as Dictionary<string, string> ?? new Dictionary<string, string>();
+    var nameValue = ViewData["Name"] as string ?? string.Empty;
+    var emailValue = ViewData["Email"] as string ?? string.Empty;
+    var subjectValue = ViewData["Subject"] as string ?? string.Empty;
+    var messageValue = ViewData["Message"] as string ?? string.Empty;
 }
 
-<h1>Contact</h1>
+<section class="contact-page">
+    <h1>Contact</h1>
+    <p class="contact-intro">Stuur je vraag of bericht via onderstaand formulier.</p>
 
-<form id="contactForm" asp-action="Index" method="post" novalidate>
-    @Html.AntiForgeryToken()
-    <div class="hp">
-        <label for="website">Laat dit veld leeg</label>
-        <input type="text" id="website" name="website" value="" />
-    </div>
-    <div>
-        <input id="Name" name="Name" placeholder="Naam" tabindex="-1" />
-        <div id="nameErr" class="error"></div>
-    </div>
-    <div>
-        <label for="EmailX">E-mail</label>
-        <input id="Email" name="Email" placeholder="naam@domein.nl" />
-        <div id="emailErr" class="error"></div>
-    </div>
-    <div>
-        <label for="Subject">Onderwerp</label>
-        <input id="Subject" name="Subject" placeholder="Onderwerp" />
-    </div>
-    <div>
-        <label for="Message" aria-hidden="true">Bericht</label> 
-        <textarea id="Message" name="Message" rows="5" placeholder="Je bericht"></textarea>
-        <div id="msgErr" class="error"></div>
-    </div>
-    <div id="liveStatus"></div>
-    <div class="send-button" role="button" onclick="document.getElementById('contactForm').submit()">
-        Versturen
-    </div>
-</form>
+    @if (errors.ContainsKey("Form"))
+    {
+        <div class="alert alert-danger" role="alert" aria-live="assertive">@errors["Form"]</div>
+    }
+
+    <form id="contactForm" asp-action="Index" method="post" class="contact-form" autocomplete="on">
+        @Html.AntiForgeryToken()
+
+        <div class="hp" aria-hidden="true">
+            <label for="website">Laat dit veld leeg</label>
+            <input type="text" id="website" name="website" value="" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <div class="mb-3">
+            <label for="Name" class="form-label">Naam</label>
+            <input id="Name" name="Name" type="text" class="form-control" value="@nameValue" required maxlength="100" autocomplete="name" aria-describedby="nameErr" />
+            <div id="nameErr" class="field-error" aria-live="polite">@(errors.TryGetValue("Name", out var nameError) ? nameError : string.Empty)</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="Email" class="form-label">E-mail</label>
+            <input id="Email" name="Email" type="email" class="form-control" value="@emailValue" required maxlength="150" autocomplete="email" aria-describedby="emailErr" />
+            <div id="emailErr" class="field-error" aria-live="polite">@(errors.TryGetValue("Email", out var emailError) ? emailError : string.Empty)</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="Subject" class="form-label">Onderwerp</label>
+            <input id="Subject" name="Subject" type="text" class="form-control" value="@subjectValue" required maxlength="150" aria-describedby="subjectErr" />
+            <div id="subjectErr" class="field-error" aria-live="polite">@(errors.TryGetValue("Subject", out var subjectError) ? subjectError : string.Empty)</div>
+        </div>
+
+        <div class="mb-3">
+            <label for="Message" class="form-label">Bericht</label>
+            <textarea id="Message" name="Message" rows="6" class="form-control" required maxlength="2000" aria-describedby="msgErr">@messageValue</textarea>
+            <div id="msgErr" class="field-error" aria-live="polite">@(errors.TryGetValue("Message", out var messageError) ? messageError : string.Empty)</div>
+        </div>
+
+        <div id="liveStatus" class="sr-live" aria-live="polite"></div>
+
+        <button type="submit" class="btn btn-primary">Versturen</button>
+    </form>
+</section>
