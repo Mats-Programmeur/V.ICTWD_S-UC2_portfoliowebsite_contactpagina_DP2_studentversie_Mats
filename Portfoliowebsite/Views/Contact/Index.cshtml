@@ -26,7 +26,7 @@
 
         <div class="mb-3">
             <label for="Name" class="form-label">Naam</label>
-            <input id="Name" name="Name" type="text" class="form-control" value="@nameValue" required maxlength="100" autocomplete="name" aria-describedby="nameErr" />
+            <input id="Name" name="Name" type="text" class="form-control" value="@nameValue" required maxlength="100" autocomplete="name" pattern="^[^0-9]+$" title="Naam mag geen cijfers bevatten." aria-describedby="nameErr" />
             <div id="nameErr" class="field-error" aria-live="polite">@(errors.TryGetValue("Name", out var nameError) ? nameError : string.Empty)</div>
         </div>
 
