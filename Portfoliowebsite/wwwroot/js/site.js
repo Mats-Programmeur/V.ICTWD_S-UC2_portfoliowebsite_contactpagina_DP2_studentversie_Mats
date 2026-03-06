@@ -46,6 +46,9 @@
         }
 
         field.input.addEventListener('input', () => {
+            if (field.input.id === 'Name') {
+                field.input.value = field.input.value.replace(/[0-9]/g, '');
+            }
             validateField(field);
         });
 

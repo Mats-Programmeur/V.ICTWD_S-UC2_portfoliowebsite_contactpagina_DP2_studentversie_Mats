@@ -6,6 +6,11 @@ namespace Portfoliowebsite.Controllers
 {
     public class ContactController : Controller
     {
+        private const int MaxNameLength = 100;
+        private const int MaxEmailLength = 150;
+        private const int MaxSubjectLength = 150;
+        private const int MaxMessageLength = 2000;
+
         private readonly IEmailSender _email;
         private readonly ILogger<ContactController> _logger;
 
@@ -19,6 +24,8 @@ namespace Portfoliowebsite.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequestSizeLimit(16_384)]
+        [RequestFormLimits(ValueLengthLimit = 4096)]
         public async Task<IActionResult> Index(string Name, string Email, string Subject, string Message, string? website)
         {
             Name = Name?.Trim() ?? string.Empty;
@@ -37,10 +44,22 @@ namespace Portfoliowebsite.Controllers
             {
                 errors["Name"] = "Vul je naam in.";
             }
+            else if (Name.Length > MaxNameLength)
+            {
+                errors["Name"] = $"Naam mag maximaal {MaxNameLength} tekens bevatten.";
+            }
+            else if (Name.Any(char.IsDigit))
+            {
+                errors["Name"] = "Naam mag geen cijfers bevatten.";
+            }
 
             if (string.IsNullOrWhiteSpace(Email))
             {
                 errors["Email"] = "Vul je e-mailadres in.";
+            }
+            else if (Email.Length > MaxEmailLength)
+            {
+                errors["Email"] = $"E-mail mag maximaal {MaxEmailLength} tekens bevatten.";
             }
             else if (!IsValidEmail(Email))
             {
@@ -51,10 +70,18 @@ namespace Portfoliowebsite.Controllers
             {
                 errors["Subject"] = "Vul een onderwerp in.";
             }
+            else if (Subject.Length > MaxSubjectLength)
+            {
+                errors["Subject"] = $"Onderwerp mag maximaal {MaxSubjectLength} tekens bevatten.";
+            }
 
             if (string.IsNullOrWhiteSpace(Message))
             {
                 errors["Message"] = "Vul een bericht in.";
+            }
+            else if (Message.Length > MaxMessageLength)
+            {
+                errors["Message"] = $"Bericht mag maximaal {MaxMessageLength} tekens bevatten.";
             }
             else if (Message.Length < 10)
             {
